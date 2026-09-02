@@ -36,6 +36,11 @@ Register-ScheduledTask -TaskName "MyPipelineJob" -Action $action -Trigger $trigg
 Get-Process powershell | Select-Object Id, StartTime; Get-Content "C:\Scripts\output.log" -Tail 10
 
 
+#stop
+Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force
+Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "*Pipeline*" } | Unregister-ScheduledTask -Confirm:$false
+
+Write-Host "Stopped. Pipeline killed and auto-start removed."
 
 
 
