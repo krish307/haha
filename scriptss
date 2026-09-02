@@ -15,6 +15,72 @@
    Get-ChildItem $dest
    Test-Path "C:\Scripts\pipeline.ps1"
 
+#start0
+# ==========================================
+# MyPipelineJob - automatic startup setup
+# ==========================================
+
+$TaskName  = "MyPipelineJob"
+$ScriptPath = "C:\Scripts\pipeline.ps1"
+
+# Check that the actual pipeline exists
+if (-not (Test-Path $ScriptPath)) {
+    Write-Host "ERROR: $ScriptPath was not found."
+    exit 1
+}
+
+# Remove old task if it exists
+$oldTask = Get-ScheduledTask `
+    -TaskName $TaskName `
+    -ErrorAction SilentlyContinue
+
+if ($oldTask) {
+    Unregister-ScheduledTask `
+        -TaskName $TaskName `
+        -Confirm:$false `
+        -ErrorAction SilentlyContinue
+
+    Start-Sleep -Seconds 2
+}
+
+# Remove old lock file
+Remove-Item `
+    "C:\Scripts\pipeline.lock" `
+    -Force `
+    -ErrorAction SilentlyContinue
+
+# Create action
+$action = New-ScheduledTaskAction `
+    -Execute "powershell.exe" `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$ScriptPath`"" `
+    -WorkingDirectory "C:\Scripts"
+
+# Run when your Windows account logs in
+$trigger = New-ScheduledTaskTrigger -AtLogOn
+
+# Keep running and allow battery operation
+$settings = New-ScheduledTaskSettingsSet `
+    -Hidden `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -ExecutionTimeLimit ([TimeSpan]::Zero)
+
+# Register the task
+Register-ScheduledTask `
+    -TaskName $TaskName `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -RunLevel Highest `
+    -Force
+
+Write-Host ""
+Write-Host "=========================================="
+Write-Host "MyPipelineJob configured successfully."
+Write-Host "=========================================="
+Write-Host ""
+Write-Host "It will start automatically at your next Windows login."
+
 #start
 Get-Process powershell -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -eq "" } | Stop-Process -Force
 
