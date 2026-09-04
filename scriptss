@@ -92,6 +92,18 @@ Remove-Item "C:\Scripts\pipeline.lock" -Force -ErrorAction SilentlyContinue
 
 
 $scriptPath = "C:\Scripts\pipeline.ps1"
+$content = Get-Content $scriptPath -Raw
+if ($content -notmatch "pipeline\.lock") {
+    $lockCode = @'
+$LockFile = "C:\Scripts\pipeline.lock"
+if (Test-Path $LockFile) { exit }
+New-Item -Path $LockFile -ItemType File -Force | Out-Null
+Register-EngineEvent PowerShell.Exiting -Action { Remove-Item "C:\Scripts\pipeline.lock" -Force -ErrorAction SilentlyContinue } | Out-Null
+
+'@
+    Set-Content -Path $scriptPath -Value ($lockCode + $content)
+}
+
 
 
 Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"C:\Scripts\pipeline.ps1`"" -WindowStyle Hidden -WorkingDirectory "C:\Scripts"
