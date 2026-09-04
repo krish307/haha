@@ -56,7 +56,7 @@ $action = New-ScheduledTaskAction `
     -WorkingDirectory "C:\Scripts"
 
 # Run when your Windows account logs in
-$trigger = New-ScheduledTaskTrigger -AtLogOn
+$trigger = New-ScheduledTaskTrigger -Atstartup
 
 # Keep running and allow battery operation
 $settings = New-ScheduledTaskSettingsSet `
@@ -110,7 +110,7 @@ Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -
 
 
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"C:\Scripts\pipeline.ps1`"" -WorkingDirectory "C:\Scripts"
-$trigger = New-ScheduledTaskTrigger -AtLogOn
+$trigger = New-ScheduledTaskTrigger -Atstartup
 $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName "MyPipelineJob" -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest
 
