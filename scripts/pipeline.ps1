@@ -1,9 +1,4 @@
-$LockFile = "C:\Scripts\pipeline.lock"
-if (Test-Path $LockFile) { exit }
-New-Item -Path $LockFile -ItemType File -Force | Out-Null
-Register-EngineEvent PowerShell.Exiting -Action { Remove-Item "C:\Scripts\pipeline.lock" -Force -ErrorAction SilentlyContinue } | Out-Null
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+
 
 # Make PowerShell DPI-aware before accessing screen information
 Add-Type @"
