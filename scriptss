@@ -114,7 +114,8 @@ $trigger = New-ScheduledTaskTrigger -AtLogOn
 $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
 Register-ScheduledTask -TaskName "MyPipelineJob" -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest
 
-
+#remove the lock
+ Remove-Item "C:\Scripts\pipeline.lock" -Force -ErrorAction SilentlyContinue
 
 #check
 Get-Process powershell | Select-Object Id, StartTime; Get-Content "C:\Scripts\output.log" -Tail 10
