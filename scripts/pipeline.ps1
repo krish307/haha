@@ -1,4 +1,5 @@
-
+Add-Type -AssemblyName System.Windows.Forms
+# ... rest of your existing pipeline.ps1 code below
 
 # Make PowerShell DPI-aware before accessing screen information
 Add-Type @"
